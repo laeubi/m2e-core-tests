@@ -94,7 +94,8 @@ public class MavenProjectMutableStateTest extends AbstractMavenProjectTestCase {
         MavenProject mavenProject = facade.getMavenProject(monitor);
         MojoExecution execution = facade.getMojoExecutions("org.eclipse.m2e.test.lifecyclemapping",
             "test-buildhelper-plugin", monitor, "publish").get(0);
-        maven.execute(mavenProject, execution, monitor);
+        IMavenExecutionContext.getThreadContext().orElseGet(maven::createExecutionContext).execute(mavenProject,
+            execution, monitor);
 
         assertMutableState(project);
       }

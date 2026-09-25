@@ -21,6 +21,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -190,7 +191,7 @@ public class MavenProjectFacadeTest extends AbstractMavenProjectTestCase {
 
     testIsStale(project, "pom.xml");
     for(IPath filename : ProjectRegistryManager.METADATA_PATH) {
-      MavenPlugin.getMaven().execute(true /*offline*/, false /*updateSnapshots*/, (c, m) -> {
+      MavenImpl.execute(MavenPlugin.getMaven(), true /*offline*/, false /*updateSnapshots*/, (c, m) -> {
         ProjectRegistryManager projectManager = MavenPluginActivator.getDefault().getMavenProjectManagerImpl();
         projectManager.refresh(getPomFiles(project), monitor);
         return null;

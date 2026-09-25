@@ -142,7 +142,7 @@ public class MavenExecutionContextTest extends AbstractMavenProjectTestCase {
 
   @Test
   public void testExecutionRequestContainsSystemProperties() throws Exception {
-    maven.execute((context, monitor) -> {
+    IMavenExecutionContext.getThreadContext().orElseGet(maven::createExecutionContext).execute((context, monitor) -> {
       MavenExecutionRequest request = context.getExecutionRequest();
       assertNotNull(request);
       assertNotNull(request.getSystemProperties());
@@ -157,7 +157,7 @@ public class MavenExecutionContextTest extends AbstractMavenProjectTestCase {
   @Test
   public void test496492_threadContextClassloaderLeak() throws Exception {
     ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-    maven.execute((context, monitor) -> {
+    IMavenExecutionContext.getThreadContext().orElseGet(maven::createExecutionContext).execute((context, monitor) -> {
       Thread.currentThread().setContextClassLoader(new URLClassLoader(new URL[0]));
       return null;
     }, monitor);

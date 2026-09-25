@@ -530,7 +530,8 @@ public class MavenImplTest extends AbstractMavenProjectTestCase {
 
   private MavenExecutionResult readMavenProject(final File pomFile, final boolean resolveDependencies,
       IProgressMonitor monitor) throws CoreException {
-    return maven.execute((context, monitor1) -> {
+    return IMavenExecutionContext.getThreadContext().orElseGet(maven::createExecutionContext)
+        .execute((context, monitor1) -> {
       ProjectBuildingRequest configuration = context.newProjectBuildingRequest();
       configuration.setResolveDependencies(resolveDependencies);
       return maven.readMavenProject(pomFile, configuration);
@@ -580,7 +581,8 @@ public class MavenImplTest extends AbstractMavenProjectTestCase {
     MavenExecutionContext context = maven.createExecutionContext();
     result = context.execute(project, (context1, monitor) -> {
       MavenSession session = context1.getSession();
-      maven.execute(session.getCurrentProject(), execution, monitor);
+      IMavenExecutionContext.getThreadContext().orElseGet(maven::createExecutionContext)
+          .execute(session.getCurrentProject(), execution, monitor);
       return session.getResult();
     }, monitor);
 
