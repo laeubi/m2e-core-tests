@@ -72,7 +72,7 @@ public class MappingDiscoveryJobTest extends AbstractMavenProjectTestCase {
     boolean openedMappingWizard;
 
     public MappingDiscoveryJobNoUI(Collection<IProject> projects) {
-      super(projects);
+      super(projects, false);
     }
 
     @Override
