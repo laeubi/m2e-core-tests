@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 
 import org.codehaus.plexus.util.FileUtils;
 
@@ -42,6 +43,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
@@ -52,6 +54,7 @@ import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
@@ -75,7 +78,7 @@ public class MavenImplTest extends AbstractMavenProjectTestCase {
     assertFalse(result.hasExceptions());
     MavenProject project = result.getProject();
 
-    MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(project, Arrays.asList("compile"), true, monitor);
+    MavenExecutionPlan executionPlan = calculateExecutionPlan(project, Arrays.asList("compile"), true, monitor);
 
     MojoExecution execution = getExecution(executionPlan, "maven-compiler-plugin", "compile");
 
@@ -347,7 +350,7 @@ public class MavenImplTest extends AbstractMavenProjectTestCase {
       assertNotNull(result.getProject().getArtifacts());
       assertEquals(result.getProject().getArtifacts().toString(), 1, result.getProject().getArtifacts().size());
 
-      MavenExecutionPlan plan = maven.calculateExecutionPlan(result.getProject(), Arrays.asList("verify"), true,
+      MavenExecutionPlan plan = calculateExecutionPlan(result.getProject(), Arrays.asList("verify"), true,
           monitor);
       assertEquals(plan.getMojoExecutions().toString(), 2, plan.getMojoExecutions().size());
     } finally {
@@ -571,7 +574,7 @@ public class MavenImplTest extends AbstractMavenProjectTestCase {
     MavenExecutionResult result = readMavenProject(new File("projects/438454_guiceScopes/pom.xml"), false);
     assertFalse(result.hasExceptions());
     MavenProject project = result.getProject();
-    MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(project, Arrays.asList("compile"), true, monitor);
+    MavenExecutionPlan executionPlan = calculateExecutionPlan(project, Arrays.asList("compile"), true, monitor);
     final MojoExecution execution = getExecution(executionPlan, "438454_guicescopes-plugin", "guicescopes");
 
     MavenExecutionContext context = maven.createExecutionContext();
@@ -582,5 +585,20 @@ public class MavenImplTest extends AbstractMavenProjectTestCase {
     }, monitor);
 
     assertFalse(result.getExceptions().toString(), result.hasExceptions());
+  }
+
+  private MavenExecutionPlan calculateExecutionPlan(MavenSession session, List<String> goals, boolean setup)
+      throws CoreException {
+    try {
+      return maven.lookup(LifecycleExecutor.class).calculateExecutionPlan(session, setup, goals.toArray(String[]::new));
+    } catch(Exception ex) {
+      throw new CoreException(Status.error("Can't compute execution plan", ex));
+    }
+  }
+
+  public MavenExecutionPlan calculateExecutionPlan(MavenProject project, List<String> goals, boolean setup,
+      IProgressMonitor monitor) throws CoreException {
+    return IMavenExecutionContext.getThreadContext().orElseGet(maven::createExecutionContext).execute(project,
+        (context, pm) -> calculateExecutionPlan(context.getSession(), goals, setup), monitor);
   }
 }
