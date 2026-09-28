@@ -16,10 +16,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
@@ -52,11 +50,8 @@ public class MavenProjectFacadeTest extends AbstractMavenProjectTestCase {
     assertNotNull(compileKey);
     MojoExecution compileMojo = facade.getMojoExecution(compileKey, monitor);
 
-    final IMaven maven = MavenPlugin.getMaven();
-    final MavenProject mavenProject = facade.getMavenProject(monitor);
-
-    assertEquals("1.5", maven.getMojoParameterValue(mavenProject, compileMojo, "source", String.class, monitor));
-    assertEquals("1.6", maven.getMojoParameterValue(mavenProject, compileMojo, "target", String.class, monitor));
+    assertEquals("1.5", facade.getMojoParameterValue(compileMojo, "source", String.class, monitor));
+    assertEquals("1.6", facade.getMojoParameterValue(compileMojo, "target", String.class, monitor));
   }
 
   @Test
@@ -78,11 +73,8 @@ public class MavenProjectFacadeTest extends AbstractMavenProjectTestCase {
     assertNotNull(compileKey);
     MojoExecution compileMojo = facade.getMojoExecution(compileKey, monitor);
 
-    final IMaven maven = MavenPlugin.getMaven();
-    final MavenProject mavenProject = facade.getMavenProject(monitor);
-
-    assertEquals("1.5", maven.getMojoParameterValue(mavenProject, compileMojo, "source", String.class, monitor));
-    assertEquals("1.6", maven.getMojoParameterValue(mavenProject, compileMojo, "target", String.class, monitor));
+    assertEquals("1.5", facade.getMojoParameterValue(compileMojo, "source", String.class, monitor));
+    assertEquals("1.6", facade.getMojoParameterValue(compileMojo, "target", String.class, monitor));
   }
 
   @Test
@@ -96,11 +88,8 @@ public class MavenProjectFacadeTest extends AbstractMavenProjectTestCase {
         monitor, "compile");
     assertEquals(executions.toString(), 1, executions.size());
 
-    final IMaven maven = MavenPlugin.getMaven();
-    final MavenProject mavenProject = facade.getMavenProject(monitor);
-
-    assertEquals("1.5", maven.getMojoParameterValue(mavenProject, executions.get(0), "source", String.class, monitor));
-    assertEquals("1.6", maven.getMojoParameterValue(mavenProject, executions.get(0), "target", String.class, monitor));
+    assertEquals("1.5", facade.getMojoParameterValue(executions.get(0), "source", String.class, monitor));
+    assertEquals("1.6", facade.getMojoParameterValue(executions.get(0), "target", String.class, monitor));
   }
 
   @RequireMavenExecutionContext(require = false)
@@ -131,11 +120,8 @@ public class MavenProjectFacadeTest extends AbstractMavenProjectTestCase {
         monitor, "compile");
     assertEquals(executions.toString(), 1, executions.size());
 
-    final IMaven maven = MavenPlugin.getMaven();
-    final MavenProject mavenProject = facade.getMavenProject(monitor);
-
-    assertEquals("1.5", maven.getMojoParameterValue(mavenProject, executions.get(0), "source", String.class, monitor));
-    assertEquals("1.6", maven.getMojoParameterValue(mavenProject, executions.get(0), "target", String.class, monitor));
+    assertEquals("1.5", facade.getMojoParameterValue(executions.get(0), "source", String.class, monitor));
+    assertEquals("1.6", facade.getMojoParameterValue(executions.get(0), "target", String.class, monitor));
   }
 
   @Test
