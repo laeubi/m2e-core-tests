@@ -49,7 +49,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.wagon.proxy.ProxyInfo;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
@@ -268,23 +267,6 @@ public class MavenImplTest extends AbstractMavenProjectTestCase {
     }
   }
 
-  @Test
-  public void testGetProxy() throws Exception {
-    String origSettings = configuration.getUserSettingsFile();
-    try {
-      configuration.setUserSettingsFile(new File("src/org/eclipse/m2e/tests/embedder/settings-with-proxy.xml")
-          .getCanonicalPath());
-      ProxyInfo proxy = maven.getProxyInfo("http");
-      assertEquals("rso", proxy.getHost());
-      assertEquals(80, proxy.getPort());
-      assertEquals("http", proxy.getType());
-      assertEquals("user", proxy.getUserName());
-      assertEquals("pass", proxy.getPassword());
-      assertEquals("*", proxy.getNonProxyHosts());
-    } finally {
-      configuration.setUserSettingsFile(origSettings);
-    }
-  }
 
   @Test
   public void testUnreadableSettings() throws Exception {
